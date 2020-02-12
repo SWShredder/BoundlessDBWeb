@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace BoundlessDBWeb.Models
     public class Transaction
     {
         private BoundlessDbContext context;
+        [ReadOnly(true)]
         public int TransactionId { set; get; }
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy/MM/dd}")]
         [Required]

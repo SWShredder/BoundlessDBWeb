@@ -58,7 +58,23 @@ namespace BoundlessDBWeb.Controllers
             {
                 if (context.SaveTransaction(transaction))
                 {
-                    return RedirectToAction("Index");
+                    ViewData["Message"] = $"Transaction: {transaction.ItemName} was added";
+                    Transaction model = new Transaction();
+                    model.ItemList = new List<SelectListItem>();
+                    model.LocationList = new List<SelectListItem>();
+                    List<string> names = context.GetItemNames();
+                    List<string> locNames = context.GetLocationNames();
+                    foreach (var item in names)
+                    {
+                        model.ItemList.Add(new SelectListItem { Text = item });
+                    }
+                    foreach (string locName in locNames)
+                    {
+                        model.LocationList.Add(new SelectListItem { Text = locName, Value = locName });
+                    }
+                    model.Date = DateTime.Now;
+                    return View(model);
+
                 }
                 else
                 {
@@ -74,23 +90,44 @@ namespace BoundlessDBWeb.Controllers
         // GET: Transaction/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            context = GetContext();
+            Transaction transaction = context.GetTransaction(id);
+            transaction.ItemList = new List<SelectListItem>();
+            transaction.LocationList = new List<SelectListItem>();
+            List<string> names = context.GetItemNames();
+            List<string> locNames = context.GetLocationNames();
+            foreach (var item in names)
+            {
+                transaction.ItemList.Add(new SelectListItem { Text = item });
+            }
+            foreach (string locName in locNames)
+            {
+                transaction.LocationList.Add(new SelectListItem { Text = locName, Value = locName });
+            }
+            return View(transaction);
         }
 
         // POST: Transaction/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(Transaction transaction)
         {
+            context = GetContext();
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
+                if (context.UpdateTransaction(transaction))
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    return Content(context.ErrorMessage);
+                }
+                
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Content(ex.ToString());
             }
         }
 
