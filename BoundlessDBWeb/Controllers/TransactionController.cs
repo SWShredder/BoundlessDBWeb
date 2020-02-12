@@ -5,16 +5,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BoundlessDBWeb.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using BoundlessDBWeb.Models;
 
 namespace BoundlessDBWeb.Controllers
 {
     public class TransactionController : Controller
     {
+        BoundlessDbContext context;
         // GET: Transaction
         public ActionResult Index()
         {
-            BoundlessDbContext context = HttpContext.RequestServices.GetService(typeof(BoundlessDBWeb.Data.BoundlessDbContext)) as BoundlessDbContext;
-            return View(context.GetTransactions());
+            context = HttpContext.RequestServices.GetService(typeof(BoundlessDBWeb.Data.BoundlessDbContext)) as BoundlessDbContext;
+            List<Transaction> transactions = context.GetTransactions();
+            return View(transactions);
         }
 
         // GET: Transaction/Details/5
@@ -26,23 +30,44 @@ namespace BoundlessDBWeb.Controllers
         // GET: Transaction/Create
         public ActionResult Create()
         {
-            return View();
+            context = HttpContext.RequestServices.GetService(typeof(BoundlessDBWeb.Data.BoundlessDbContext)) as BoundlessDbContext;
+            Transaction model = new Transaction();
+            model.ItemList = new List<SelectListItem>();
+            model.LocationList = new List<SelectListItem>();
+            List<string> names = context.GetItemNames();
+            List<string> locNames = context.GetLocationNames();
+            foreach (var item in names)
+            {
+                model.ItemList.Add(new SelectListItem { Text = item});
+            }
+            foreach (string locName in locNames)
+            {
+                model.LocationList.Add(new SelectListItem { Text = locName, Value = locName });
+            }
+            model.Date = DateTime.Now;
+            return View(model);
         }
 
         // POST: Transaction/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Transaction transaction)
         {
+            context = HttpContext.RequestServices.GetService(typeof(BoundlessDBWeb.Data.BoundlessDbContext)) as BoundlessDbContext;
             try
             {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
+                if (context.SaveTransaction(transaction))
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    return Content("Error connecting to database " + context.ErrorMessage);
+                }
             }
             catch
             {
-                return View();
+                return Content("There was an error");
             }
         }
 
@@ -72,7 +97,9 @@ namespace BoundlessDBWeb.Controllers
         // GET: Transaction/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            context = HttpContext.RequestServices.GetService(typeof(BoundlessDBWeb.Data.BoundlessDbContext)) as BoundlessDbContext;
+            Transaction transaction = context.GetTransaction(id);
+            return View(transaction);
         }
 
         // POST: Transaction/Delete/5
@@ -80,16 +107,27 @@ namespace BoundlessDBWeb.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
+            context = GetContext();
             try
             {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
+                if (context.DeleteTransaction(id))
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    return Content("There was an error interfacing with the database : \n" + context.ErrorMessage);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return Content(ex.ToString());
             }
+        }
+
+        private BoundlessDbContext GetContext()
+        {
+            return HttpContext.RequestServices.GetService(typeof(BoundlessDBWeb.Data.BoundlessDbContext)) as BoundlessDbContext;
         }
     }
 }

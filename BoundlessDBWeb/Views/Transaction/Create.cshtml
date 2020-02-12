@@ -1,0 +1,58 @@
+﻿@model BoundlessDBWeb.Models.Transaction
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Transaction</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemName" class="control-label">Item Name</label>
+                <select asp-for="ItemName" asp-items="@Model.ItemList" class="form-control">
+                </select>
+            </div>
+            <div class=" form-group">
+                    <label asp-for="Coins" class="control-label"></label>
+                    <input asp-for="Coins" class="form-control" />
+                    <span asp-validation-for="Coins" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UnitaryValue" class="control-label"></label>
+                <input asp-for="UnitaryValue" class="form-control" />
+                <span asp-validation-for="UnitaryValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LocationName" class="control-label">Location</label>
+                <select asp-for="LocationName" asp-items="@Model.LocationList" class="form-control">
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
