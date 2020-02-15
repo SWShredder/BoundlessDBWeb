@@ -21,7 +21,6 @@ namespace BoundlessDBWeb
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("https://192.168.0.182:443");
                 });
     }
 }

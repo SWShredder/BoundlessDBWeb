@@ -20,7 +20,6 @@ namespace BoundlessDBWeb.Models
         [Required]
         public string ItemName { set; get; }
         public double Coins { set; get; }
-        [Required]
         public double UnitaryValue { set; get; }
         public int Quantity { set; get; }
         [Required]

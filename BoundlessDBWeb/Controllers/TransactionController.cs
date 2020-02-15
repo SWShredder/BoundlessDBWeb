@@ -27,6 +27,7 @@ namespace BoundlessDBWeb.Controllers
             return View();
         }
 
+
         // GET: Transaction/Create
         public ActionResult Create()
         {
